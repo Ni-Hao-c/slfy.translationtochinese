@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Editor": {
+      "commandName": "Executable",
+      "executablePath": "../../../../../../Game/steams/steamapps/common/sbox/sbox-dev.exe",
+      "commandLineArgs": "-project \u0022d:\\s\\game1\\Libraries\\slfy.translationtochinese\\translationtochinese.sbproj\u0022"
+    }
+  }
+}

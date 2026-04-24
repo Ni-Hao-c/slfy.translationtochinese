@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\translationtochinese.editor.props" />
+</Project>
