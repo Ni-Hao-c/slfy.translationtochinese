@@ -71,7 +71,9 @@ translationToChinese/
 
 ## 1. 在另一个项目里引入
 
-最稳的方式是直接复制整个库目录：
+先从 GitHub 下载这个库。
+
+然后把整个库目录放到目标项目的 `Libraries` 目录下：
 
 ```text
 你的项目/
@@ -94,7 +96,9 @@ translationToChinese/
 
 ## 2. 打开项目并验证
 
-启动 s&box 编辑器后，菜单栏会出现：
+把库放进 `Libraries` 目录后，先重启一次 s&box 编辑器。
+
+重启后再打开项目，菜单栏会出现：
 
 - `Translation`
 
@@ -108,10 +112,13 @@ translationToChinese/
 
 建议初次验证时按这个顺序：
 
-1. 打开项目
-2. 点击 `Translation -> Apply Chinese Patch`
-3. 点击 `Translation -> Reload Translation Files`
-4. 如有必要，点击 `Translation -> Restart Editor UI`
+1. 下载这个库
+2. 放到 `你的项目/Libraries/` 目录下
+3. 重启 s&box 编辑器
+4. 打开项目
+5. 点击 `Translation -> Apply Chinese Patch`
+6. 点击 `Translation -> Reload Translation Files`
+7. 如有必要，点击 `Translation -> Restart Editor UI`
 
 如果加载成功，Console 里通常会看到类似：
 

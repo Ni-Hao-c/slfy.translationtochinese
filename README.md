@@ -67,7 +67,9 @@ translationToChinese/
 
 ## 1. Add it to another project
 
-The safest approach is to copy the whole library folder into the target project:
+First, download this library from GitHub.
+
+Then copy the whole library folder into the target project's `Libraries` directory:
 
 ```text
 YourProject/
@@ -90,7 +92,9 @@ If you cloned a working template project, this is often already wired up.
 
 ## 2. Start the editor and verify
 
-After opening the project in s&box, you should see a:
+After placing the folder under `Libraries`, restart the s&box editor.
+
+After restarting and opening the project in s&box, you should see a:
 
 - `Translation`
 
@@ -106,10 +110,13 @@ Useful commands include:
 
 Suggested first-run validation:
 
-1. Open the project
-2. Click `Translation -> Apply Chinese Patch`
-3. Click `Translation -> Reload Translation Files`
-4. If needed, click `Translation -> Restart Editor UI`
+1. Download this library
+2. Put it under `YourProject/Libraries/`
+3. Restart the s&box editor
+4. Open the project
+5. Click `Translation -> Apply Chinese Patch`
+6. Click `Translation -> Reload Translation Files`
+7. If needed, click `Translation -> Restart Editor UI`
 
 When translation files are loaded successfully, the console usually prints something like:
 
