@@ -9,9 +9,6 @@ namespace Editor;
 public static class SboxChinesePatch
 {
 	const string HarmonyId = "local.translation.sbox-editor-zh-cn";
-	// This project ships the library under Libraries/slfy.translationtochinese, so path probing must
-	// use the actual folder name instead of the original template name.
-	const string LibraryFolderName = "slfy.translationtochinese";
 
 	static readonly Sandbox.Diagnostics.Logger Logger = new( "SboxChinesePatch" );
 	static bool installed;
@@ -244,26 +241,29 @@ public static class SboxChinesePatch
 		if ( string.IsNullOrWhiteSpace( projectRoot ) )
 			projectRoot = Directory.GetCurrentDirectory();
 
-		var projectLibraryRoot = Path.Combine( projectRoot, "Libraries", LibraryFolderName );
+		var projectLibrariesRoot = Path.Combine( projectRoot, "Libraries" );
 		var assemblyDirectory = Path.GetDirectoryName( typeof( SboxChinesePatch ).Assembly.Location ) ?? AppContext.BaseDirectory;
 		var outputRoot = Path.Combine( assemblyDirectory, ".vs", "output" );
 		var baseDirectoryOutputRoot = Path.Combine( AppContext.BaseDirectory, ".vs", "output" );
+		var libraryHarmonyCandidates = Directory.Exists( projectLibrariesRoot )
+			? Directory.GetDirectories( projectLibrariesRoot )
+				.Select( x => Path.Combine( x, "Assets", "3rd", "harmony", "0Harmony.dll" ) )
+			: Enumerable.Empty<string>();
 
 		// Library projects do not always run from the project root. Depending on how s&box bootstraps the editor,
-		// Harmony can live in the consuming project's Libraries folder, beside the compiled output, or directly in
-		// .vs/output when the editor project copied content there. Probe all explicit library locations first so
-		// future project copies do not depend on whichever implicit current directory happens to be active.
+		// Harmony can live in the project root, inside any library's Assets/3rd/harmony folder, beside the compiled
+		// output, or directly in .vs/output. Enumerating Libraries avoids depending on a specific extracted folder name.
 		var candidates = new[]
 		{
 			Path.Combine( projectRoot, "Assets", "3rd", "harmony", "0Harmony.dll" ),
-			Path.Combine( projectLibraryRoot, "Assets", "3rd", "harmony", "0Harmony.dll" ),
 			Path.Combine( assemblyDirectory, "0Harmony.dll" ),
 			Path.Combine( outputRoot, "0Harmony.dll" ),
-			Path.Combine( assemblyDirectory, LibraryFolderName, "Assets", "3rd", "harmony", "0Harmony.dll" ),
 			Path.Combine( AppContext.BaseDirectory, "0Harmony.dll" ),
-			Path.Combine( baseDirectoryOutputRoot, "0Harmony.dll" ),
-			Path.Combine( AppContext.BaseDirectory, LibraryFolderName, "Assets", "3rd", "harmony", "0Harmony.dll" )
-		};
+			Path.Combine( baseDirectoryOutputRoot, "0Harmony.dll" )
+		}
+			.Concat( libraryHarmonyCandidates )
+			.Distinct( StringComparer.OrdinalIgnoreCase )
+			.ToArray();
 
 		var path = candidates.FirstOrDefault( File.Exists );
 		if ( string.IsNullOrWhiteSpace( path ) )
@@ -853,4 +853,3 @@ public static class SboxChinesePatch
 		}
 	}
 }
-

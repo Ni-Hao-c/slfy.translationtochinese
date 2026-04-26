@@ -8,9 +8,6 @@ namespace Editor;
 
 static class SboxTranslationFiles
 {
-	// Keep this in sync with the real library folder name inside the consuming project. The loader
-	// uses it to probe Libraries/<folder>/Localization before falling back to output directories.
-	const string LibraryFolderName = "slfy.translationtochinese";
 	// Translation files are reloaded at runtime, so keep file loading isolated from Harmony patching.
 	static readonly Sandbox.Diagnostics.Logger Logger = new( "SboxTranslationFiles" );
 	static readonly object LoadLock = new();
@@ -255,30 +252,44 @@ static class SboxTranslationFiles
 
 	static IEnumerable<string> GetTranslationRoots( string projectRoot )
 	{
-		yield return projectRoot;
-
-		var projectLibraryRoot = Path.Combine( projectRoot, "Libraries", LibraryFolderName );
 		var assemblyDirectory = Path.GetDirectoryName( typeof( SboxTranslationFiles ).Assembly.Location ) ?? AppContext.BaseDirectory;
-		var libraryRoot = Path.Combine( assemblyDirectory, LibraryFolderName );
-		var outputLibraryRoot = Path.Combine( assemblyDirectory, ".vs", "output", LibraryFolderName );
+		var outputRoot = Path.Combine( assemblyDirectory, ".vs", "output" );
+		var seen = new HashSet<string>( StringComparer.OrdinalIgnoreCase );
 
-		// Keep consuming-project files first so teams can override defaults without touching the shared library.
-		// Explicitly support Libraries/translationToChinese as well, because copied library projects often keep
-		// their json files there instead of duplicating them into the project root Localization folder.
-		if ( !string.Equals( projectLibraryRoot, projectRoot, StringComparison.OrdinalIgnoreCase ) )
-			yield return projectLibraryRoot;
+		if ( seen.Add( projectRoot ) )
+			yield return projectRoot;
+
+		// Keep consuming-project library folders first so teams can override defaults without touching the
+		// shared library. Enumerating Libraries avoids depending on a specific extracted folder name.
+		foreach ( var root in EnumerateChildDirectories( Path.Combine( projectRoot, "Libraries" ) ) )
+		{
+			if ( seen.Add( root ) )
+				yield return root;
+		}
 
 		// When the patch ships as a library, translation files may live beside the compiled library output
-		// rather than inside the consuming project's root. Keep these as fallbacks so the packaged library
-		// stays self-contained even if the consuming project has no local Localization folder at all.
-		if ( !string.Equals( libraryRoot, projectRoot, StringComparison.OrdinalIgnoreCase ) )
-			yield return libraryRoot;
-
-		if ( !string.Equals( outputLibraryRoot, projectRoot, StringComparison.OrdinalIgnoreCase ) &&
-			!string.Equals( outputLibraryRoot, projectLibraryRoot, StringComparison.OrdinalIgnoreCase ) &&
-			!string.Equals( outputLibraryRoot, libraryRoot, StringComparison.OrdinalIgnoreCase ) )
+		// or inside .vs/output/<library>. Keep these as fallbacks so the packaged library stays self-contained.
+		foreach ( var root in EnumerateChildDirectories( assemblyDirectory ) )
 		{
-			yield return outputLibraryRoot;
+			if ( seen.Add( root ) )
+				yield return root;
+		}
+
+		foreach ( var root in EnumerateChildDirectories( outputRoot ) )
+		{
+			if ( seen.Add( root ) )
+				yield return root;
+		}
+	}
+
+	static IEnumerable<string> EnumerateChildDirectories( string parent )
+	{
+		if ( !Directory.Exists( parent ) )
+			yield break;
+
+		foreach ( var directory in Directory.GetDirectories( parent ) )
+		{
+			yield return directory;
 		}
 	}
 
@@ -440,4 +451,3 @@ static class SboxTranslationFiles
 		public string Description { get; set; }
 	}
 }
-
