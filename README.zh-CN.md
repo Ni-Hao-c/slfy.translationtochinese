@@ -71,6 +71,45 @@ translationToChinese/
 
 ## 1. 在另一个项目里引入
 
+先从 GitHub 下载这个库。
+
+然后把整个库目录放到目标项目的 `Libraries` 目录下：
+
+```text
+你的项目/
+  Libraries/
+    translationToChinese/
+```
+
+至少要保留：
+
+- `Assets/3rd/harmony`
+- `Editor`
+- `Localization`
+- `translationtochinese.sbproj`
+
+然后让目标项目的 editor 工程引用：
+
+- `Libraries/translationToChinese/Editor/translationtochinese.editor.csproj`
+
+如果你是从已有模板项目复制，这步通常已经接好了。
+
+## 2. 打开项目并验证
+
+把库放进 `Libraries` 目录后，先重启一次 s&box 编辑器。
+
+重启后再打开项目，菜单栏会出现：
+
+- `Translation`
+
+可用菜单包括：
+
+- `Apply Chinese Patch`
+- `Reload Translation Files`
+- `Print Missing Texts`
+- `Clear Missing Texts`
+- `Restart Editor UI`
+
 建议初次验证时按这个顺序：
 
 1. 下载这个库
@@ -87,7 +126,7 @@ translationToChinese/
 SboxTranslationFiles Loaded translations. Current=zh-CN, Fallback=en, UI=..., API=...
 ```
 
-## 2. 语言文件加载顺序
+## 3. 语言文件加载顺序
 
 为了兼顾“项目可覆盖”和“库自带默认值”，当前实现会按下面顺序寻找翻译文件：
 

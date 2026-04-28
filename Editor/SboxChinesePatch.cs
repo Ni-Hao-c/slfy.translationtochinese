@@ -9,6 +9,10 @@ namespace Editor;
 public static class SboxChinesePatch
 {
 	const string HarmonyId = "local.translation.sbox-editor-zh-cn";
+	const bool TranslationLibraryEnabled = true;
+	// Full EditorMainWindow reconstruction is known to break AssetBrowser list text in current s&box builds.
+	// Keep the code path available for future debugging, but do not let routine translation flows call it.
+	const bool RestartEditorUiEnabled = false;
 
 	static readonly Sandbox.Diagnostics.Logger Logger = new( "SboxChinesePatch" );
 	static bool installed;
@@ -20,6 +24,9 @@ public static class SboxChinesePatch
 	[EditorEvent.Frame]
 	static void InstallOnFrame()
 	{
+		if ( !TranslationLibraryEnabled )
+			return;
+
 		if ( installed )
 		{
 			if ( refreshFrames > 0 )
@@ -42,6 +49,9 @@ public static class SboxChinesePatch
 	[EditorEvent.Hotload]
 	static void InstallOnHotload()
 	{
+		if ( !TranslationLibraryEnabled )
+			return;
+
 		installed = false;
 		Install();
 	}
@@ -49,6 +59,12 @@ public static class SboxChinesePatch
 	[Menu( "Editor", "Translation/Apply Chinese Patch", "translate" )]
 	public static void Install()
 	{
+		if ( !TranslationLibraryEnabled )
+		{
+			Logger.Info( "Sbox Chinese Patch is disabled for troubleshooting." );
+			return;
+		}
+
 		if ( installed )
 			return;
 
@@ -117,9 +133,9 @@ public static class SboxChinesePatch
 			PatchMemberDescriptionStringGetters( harmonyType, harmony, resultHarmonyMethod );
 			PatchTypeDescriptionStringGetters( harmonyType, harmony, resultHarmonyMethod );
 
+			// Give newly created widgets time to pass through their normal setters after the patch is installed.
 			refreshFrames = 120;
 			ApplyExistingUi();
-			QueueRestartEditorUi();
 
 			Logger.Info( $"Sbox Chinese Patch installed. Language: {SboxTranslationFiles.CurrentLanguage}" );
 		}
@@ -166,7 +182,6 @@ public static class SboxChinesePatch
 		SboxTranslationFiles.Reload();
 		refreshFrames = 120;
 		ApplyExistingUi();
-		QueueRestartEditorUi();
 		Logger.Info( $"Translation files reloaded. Language: {SboxTranslationFiles.CurrentLanguage}" );
 	}
 
@@ -213,9 +228,17 @@ public static class SboxChinesePatch
 	[Menu( "Editor", "Translation/Restart Editor UI", "refresh" )]
 	public static void QueueRestartEditorUi()
 	{
+		if ( !RestartEditorUiEnabled )
+		{
+			Logger.Warning( "Restart Editor UI is disabled because it breaks Asset Browser name columns. Please restart the editor process instead." );
+			return;
+		}
+
 		if ( restartQueued || restartingUi )
 			return;
 
+		// Full EditorMainWindow reconstruction is intentionally manual. Rebuilding the whole dock tree fixes
+		// a few stale menu/title cases, but it can also break complex virtualized panels such as AssetBrowser.
 		restartQueued = true;
 	}
 
@@ -512,35 +535,11 @@ public static class SboxChinesePatch
 			if ( current is null || !current.IsValid )
 				return;
 
+			// Only refresh window/menu-level text here. Walking every existing widget and rewriting Label/Button text
+			// can interfere with virtualized or custom-drawn views such as the asset browser list, where the live data
+			// model and the visible cell widgets do not have a simple one-to-one relationship.
 			current.WindowTitle = SboxChineseDictionary.Translate( current.WindowTitle );
 			ApplyMenuBar( current.MenuBar );
-
-			foreach ( var widget in current.GetDescendants<Widget>() )
-			{
-				widget.WindowTitle = SboxChineseDictionary.Translate( widget.WindowTitle );
-				widget.ToolTip = SboxChineseDictionary.Translate( widget.ToolTip );
-
-				if ( widget is MenuBar menuBar )
-				{
-					ApplyMenuBar( menuBar );
-				}
-				else if ( widget is Button button )
-				{
-					button.Text = SboxChineseDictionary.Translate( button.Text );
-				}
-				else if ( widget is Label label )
-				{
-					label.Text = SboxChineseDictionary.Translate( label.Text );
-				}
-				else if ( widget is Checkbox checkbox )
-				{
-					checkbox.Text = SboxChineseDictionary.Translate( checkbox.Text );
-				}
-				else if ( widget is LineEdit lineEdit )
-				{
-					lineEdit.PlaceholderText = SboxChineseDictionary.Translate( lineEdit.PlaceholderText );
-				}
-			}
 
 			ApplyAllMenusFromObjectGraph( current );
 		}

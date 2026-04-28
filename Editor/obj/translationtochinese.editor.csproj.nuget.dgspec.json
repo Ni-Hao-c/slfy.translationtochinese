@@ -1,7 +1,7 @@
 {
   "format": 1,
   "restore": {
-    "D:\\s\\game1\\Libraries\\slfy.translationtochinese\\Editor\\translationtochinese.editor.csproj": {}
+    "D:\\x\\at\\Libraries\\slfy.translationtochinese-main\\Editor\\translationtochinese.editor.csproj": {}
   },
   "projects": {
     "D:\\Game\\steams\\steamapps\\common\\sbox\\addons\\tools\\Code\\Base Editor Library.csproj": {
@@ -2019,14 +2019,14 @@
         }
       }
     },
-    "D:\\s\\game1\\Libraries\\slfy.translationtochinese\\Editor\\translationtochinese.editor.csproj": {
+    "D:\\x\\at\\Libraries\\slfy.translationtochinese-main\\Editor\\translationtochinese.editor.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\s\\game1\\Libraries\\slfy.translationtochinese\\Editor\\translationtochinese.editor.csproj",
+        "projectUniqueName": "D:\\x\\at\\Libraries\\slfy.translationtochinese-main\\Editor\\translationtochinese.editor.csproj",
         "projectName": "translationtochinese.editor",
-        "projectPath": "D:\\s\\game1\\Libraries\\slfy.translationtochinese\\Editor\\translationtochinese.editor.csproj",
+        "projectPath": "D:\\x\\at\\Libraries\\slfy.translationtochinese-main\\Editor\\translationtochinese.editor.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "D:\\s\\game1\\Libraries\\slfy.translationtochinese\\Editor\\obj\\",
+        "outputPath": "D:\\x\\at\\Libraries\\slfy.translationtochinese-main\\Editor\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Administrator\\AppData\\Roaming\\NuGet\\NuGet.Config",
